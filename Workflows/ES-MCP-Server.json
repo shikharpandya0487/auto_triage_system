@@ -1,0 +1,67 @@
+{
+  "name": "ES MCP",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "indexId": "ipfix-*",
+        "returnAll": true,
+        "options": {
+          "query": "={\n  \"query\": {\n    \"bool\": {\n      \"filter\": [\n        {\n          \"range\": {\n            \"iana:flowStartMilliseconds\": {\n              \"gte\": \"{{ new Date(new Date($fromAI('ianaflowStartMilliseconds','flow start time of the packet','string')).getTime() - 2*60*1000).toISOString() }}\",\n              \"lte\": \"{{ new Date(new Date($fromAI('ianaflowStartMilliseconds','flow start time of the packet','string')).getTime() + 2*60*1000).toISOString() }}\"\n            }\n          }\n        }\n      ]\n    }\n  },\n  \"sort\": [\n    { \"iana:flowStartMilliseconds\": \"asc\" }\n  ]\n}"
+        }
+      },
+      "type": "n8n-nodes-base.elasticsearchTool",
+      "typeVersion": 1,
+      "position": [
+        272,
+        208
+      ],
+      "id": "b409ec4b-9820-46fc-b4c2-2fc9677a2f56",
+      "name": "Get many documents in Elasticsearch",
+      "credentials": {
+        "elasticsearchApi": {
+          "id": "C9czeeZWRDiKPqKi",
+          "name": "Elasticsearch account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "c3fe7327-b2c9-4eb4-856b-9b290d1a1eaf"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f23a3baf-37f2-45b9-837e-ab125789a3a6",
+      "name": "MCP Server Trigger1",
+      "webhookId": "c3fe7327-b2c9-4eb4-856b-9b290d1a1eaf"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many documents in Elasticsearch": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2b6f96d0-49e9-43c5-b923-7732cbe0f436",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "VaLqXezlraDhmCBb",
+  "tags": []
+}

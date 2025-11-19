@@ -1,0 +1,26 @@
+
+
+filebeat.inputs:
+  - type: kafka
+    hosts: ["kafka:9092"]          # Kafka service name from docker-compose
+    topics: ["ipfix"] # replace with your Kafka topic
+    group_id: "filebeat-group"
+
+# Elasticsearch as output
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "ipfix-%{+yyyy.MM.dd}"
+
+setup.template.name: "ipfix"
+setup.template.pattern: "ipfix-*"
+
+http.enabled: true
+http.port: 5066
+http.host: 0.0.0.0
+
+# Optional: parse JSON messages coming from Kafka
+processors:
+  - decode_json_fields:
+      fields: ["message"]
+      target: ""
+      overwrite_keys: true

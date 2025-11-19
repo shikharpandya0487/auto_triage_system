@@ -1,0 +1,134 @@
+/**
+ * \file src/build_config.h
+ * \author Lukas Hutak <lukas.hutak@cesnet.cz>
+ * \brief Build configuration
+ * \date 2016
+ */
+
+/* Copyright (C) 2016 CESNET, z.s.p.o.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of the Company nor the names of its contributors
+ *    may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ * ALTERNATIVELY, provided that this notice is retained in full, this
+ * product may be distributed under the terms of the GNU General Public
+ * License (GPL) version 2 or later, in which case the provisions
+ * of the GPL apply INSTEAD OF those given above.
+ *
+ * This software is provided ``as is'', and any express or implied
+ * warranties, including, but not limited to, the implied warranties of
+ * merchantability and fitness for a particular purpose are disclaimed.
+ * In no event shall the company or contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential
+ * damages (including, but not limited to, procurement of substitute
+ * goods or services; loss of use, data, or profits; or business
+ * interruption) however caused and on any theory of liability, whether
+ * in contract, strict liability, or tort (including negligence or
+ * otherwise) arising in any way out of the use of this software, even
+ * if advised of the possibility of such damage.
+ *
+ */
+
+#ifndef _BUILD_CONFIG_
+#define _BUILD_CONFIG_
+
+#include <endian.h>
+
+/**
+ * \internal
+ * \defgroup ipxInternalBuildConfig Build configuration
+ * \ingroup internalAPIs
+ * \brief These definitions represent build configuration.
+ *
+ * @{
+ */
+
+/** \brief IPFIXcol name                                                  */
+#define IPX_BUILD_APP_NAME "IPFIXcol2"
+
+/** \brief IPFIXcol major version                                         */
+#define IPX_BUILD_VERSION_MAJOR (@IPFIXCOL_VERSION_MAJOR@U)
+/** \brief IPFIXcol minor version                                         */
+#define IPX_BUILD_VERSION_MINOR (@IPFIXCOL_VERSION_MINOR@U)
+/** \brief IPFIXcol patch version                                         */
+#define IPX_BUILD_VERSION_PATCH (@IPFIXCOL_VERSION_PATCH@U)
+/** \brief IPFIXcol version in string representation                      */
+#define IPX_BUILD_VERSION_FULL_STR \
+    "@IPFIXCOL_VERSION_MAJOR@.@IPFIXCOL_VERSION_MINOR@.@IPFIXCOL_VERSION_PATCH@"
+
+/** \brief Path to the directory with configuration                       */
+#define IPX_DEFAULT_CONFIG_DIR \
+    "@INSTALL_DIR_SYSCONF@/ipfixcol2/"
+/** \brief Path to default (if not specified) user configuration file     */
+#define IPX_DEFAULT_STARTUP_CONFIG \
+    IPX_DEFAULT_CONFIG_DIR "startup.xml"
+/** \brief Path to the directory with plugins                             */
+#define IPX_DEFAULT_PLUGINS_DIR \
+    "@INSTALL_DIR_LIB@/ipfixcol2/"
+
+/** \brief Compiler name and version                                      */
+#define IPX_BUILD_COMPILER \
+    "@CMAKE_C_COMPILER_ID@ @CMAKE_C_COMPILER_VERSION@"
+/** \brief Build type                                                     */
+#define IPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@"
+/** \brief GIT Hash of the latest commit                                  */
+#define IPX_BUILD_GIT_HASH "@GIT_HASH@"
+
+/**
+ * \def IPX_BUILD_BYTE_ORDER
+ * \brief Determined target machine endianness
+ */
+#ifdef  __BYTE_ORDER
+    #if __BYTE_ORDER == __LITTLE_ENDIAN
+        #define IPX_BUILD_BYTE_ORDER "little endian"
+    #elif __BYTE_ORDER == __BIG_ENDIAN
+        #define IPX_BUILD_BYTE_ORDER "big endian"
+    #else
+        #define IPX_BUILD_BYTE_ORDER "unknown endian"
+    #endif
+#else
+    #define IPX_BUILD_BYTE_ORDER "unknown endian"
+#endif
+
+/**
+ * \def IPX_BUILD_ARCH
+ * \brief Determined target CPU architecture
+ */
+#if defined(__arm64) || defined(__arm64__)
+    #define IPX_BUILD_ARCH "ARM64"
+#elif defined(__arm) || defined(__arm__)
+    #define IPX_BUILD_ARCH "ARM"
+#elif defined(__i386) || defined (__i386__) || defined(__i686) \
+        || defined(__i686__)
+    #define IPX_BUILD_ARCH "x86"
+#elif defined(__x86_64) || defined (__x86_64__) || defined(__amd64) \
+        || defined(__amd64__)
+    #define IPX_BUILD_ARCH "x86-64"
+#elif defined(__ia64) || defined(__ia64__)
+    #define IPX_BUILD_ARCH "Intel Itanium"
+#elif defined(__mips) || defined(__mips__)
+    #define IPX_BUILD_ARCH "MIPS"
+#elif defined(__powerpc) || defined(__powerpc__) || defined(__ppc) \
+        || defined(__ppc__)
+    #define IPX_BUILD_ARCH "PowerPC"
+#else
+    #define IPX_BUILD_ARCH "unknown"
+#endif
+
+// Deep bind support
+#cmakedefine HAVE_RTLD_DEEPBIND
+
+/**@}*/
+
+#endif /* _BUILD_CONFIG_ */
+

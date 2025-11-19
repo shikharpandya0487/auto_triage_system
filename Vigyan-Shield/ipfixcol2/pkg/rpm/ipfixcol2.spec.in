@@ -1,0 +1,76 @@
+Name:           @CPACK_PACKAGE_NAME@
+Version:        @CPACK_PACKAGE_VERSION@
+Release:        @CPACK_PACKAGE_RELEASE@%{?dist}
+Summary:        @CPACK_PACKAGE_DESCRIPTION_SUMMARY@
+
+License:        BSD
+URL:            http://www.liberouter.org/
+Source0:        %{name}-%{version}.tar.gz
+Group:          Liberouter
+Vendor:         @CPACK_PACKAGE_VENDOR@
+Packager:       @CPACK_PACKAGE_CONTACT@
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}
+BuildRequires:  gcc >= 4.8, gcc-c++ >= 4.8, cmake >= 2.8.8, make
+BuildRequires:  libfds-devel, /usr/bin/rst2man, zlib-devel
+BuildRequires:  librdkafka-devel
+Requires:       libfds >= 0.2.0, zlib, librdkafka >= 0.9.3
+
+%description
+IPFIXcol is a flexible IPFIX (RFC 7011) flow data collector designed to
+be extensible by plugins.
+
+# Create also devel package with header files (for plugins building)
+%package        devel
+Summary:        IPFIX Collector development package
+Group:          Liberouter
+Requires:       %{name}%{?_isa} = %{version}-%{release}, libfds-devel
+
+%description devel
+IPFIXcol is a flexible IPFIX (RFC 7011) flow data collector designed to
+be extensible by plugins.
+
+This package contains header files needed for development of plugins for
+IPFIX Collector (ipfixcol).
+
+# Unzip files from tar archive
+%prep
+%autosetup
+
+#%post
+#/sbin/ldconfig
+
+#%postun
+#/sbin/ldconfig
+
+# Build source code
+%build
+%global _vpath_builddir .
+%cmake .
+make %{?_smp_mflags}
+
+# Perform installation into build directory
+%install
+make install DESTDIR=%{buildroot}
+
+# Temporarily disabled
+# TODO: %check
+#ctest -V %{?_smp_mflags}
+
+%files
+%license LICENSE
+# %doc add-docs-here
+%{_bindir}/ipfixcol2
+%{_bindir}/ipfixsend2
+%{_bindir}/fdsdump
+%{_libdir}/ipfixcol2/*.so*
+%{_mandir}/man7/*.7.gz
+
+%files devel
+%{_includedir}/ipfixcol2.h
+%{_includedir}/ipfixcol2/*.h
+%{_libdir}/pkgconfig/ipfixcol2.pc
+
+%changelog
+* Mon Oct  8 2018 Lukas Hutak <lukas.hutak@cesnet.cz> 2.0.0-1
+- Initial RPM release

@@ -1,0 +1,749 @@
+{
+  "name": "Minor Project Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        224
+      ],
+      "id": "92ebbbdf-1086-43cd-a610-12dec9bd62a1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "ipfix",
+        "fields": "={{Object.keys($node[\"Edit Fields\"].json).join(',')}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1952,
+        -64
+      ],
+      "id": "2c5e9572-c607-4a70-aa4e-2ba119360a2a",
+      "name": "Insert documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "14Ija4JNctrnuXFE",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -784,
+        -32
+      ],
+      "id": "fb7455f5-d56d-4dac-8137-9c68267b6584",
+      "name": "When chat message received",
+      "webhookId": "4cb5913e-9b1d-44a1-a212-1f928c85a329"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        192
+      ],
+      "id": "6dd3a850-1a5c-405b-973b-abb6d43bbd38",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        240
+      ],
+      "id": "888f62d8-3ab4-4cc2-b1b9-083fddc64ef3",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "14Ija4JNctrnuXFE",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf18611a-52b0-4a8f-8a4a-989c09bf86d7",
+              "name": "message",
+              "value": "={{ $('Kafka Trigger').item.json.message }}",
+              "type": "object"
+            },
+            {
+              "id": "d765509d-2476-40c0-b7e0-a3ba6c77a152",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        -64
+      ],
+      "id": "72eeac31-75a8-41a9-97c2-efd1e2d0da9f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Find documents in MongoDB about alert packets",
+        "collection": "ipfix",
+        "options": {},
+        "query": "={\n  \"_id\": {{ JSON.stringify($fromAI('id', 'ID of the document to fetch', 'string')) }}\n}"
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        288
+      ],
+      "id": "4fabb48c-13d6-4b1b-bac9-fec5985bfcdd",
+      "name": "Find documents in MongoDB",
+      "credentials": {
+        "mongoDb": {
+          "id": "14Ija4JNctrnuXFE",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "The data consists of Title\tCategory\tAttack Type\tScenario Description\tTools Used\tAttack Steps \tTarget Type\tVulnerability\tMITRE Technique\tImpact\tDetection Method\tSolution\tTags\tSource\t\nUse these details to respond to user query if required, about the attack alert\n",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1888,
+        176
+      ],
+      "id": "65c21085-9073-4666-8272-8b70d43c89c3",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "yatIE8LtVG0mHNmy",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        368
+      ],
+      "id": "1ab511cc-0361-43ee-88f5-31c171c50fba",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "The data consists of Title\tCategory\tAttack Type\tScenario Description\tTools Used\tAttack Steps \tTarget Type\tVulnerability\tMITRE Technique\tImpact\tDetection Method\tSolution\tTags\tSource\t\nUse these details to respond to user query if required, about the attack alert\n",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        192
+      ],
+      "id": "4c3fc687-72c8-4978-a611-09e09acd8314",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "yatIE8LtVG0mHNmy",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        176,
+        352
+      ],
+      "id": "498a1ea3-bd96-4657-9fa5-0773a94e76bf",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to check if an ip is malicious",
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $fromAI('ip', `ipv4 source address which is to be checked if it is malicious or not`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "611e01005b8b215bb7ab9f655c27fc91c7b30ee3c8d77dba2ce41cfbe77b41fc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -512,
+        352
+      ],
+      "id": "2cf64812-bbbd-4558-a997-d33a541fcf05",
+      "name": "VirusTotal Tool"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to AbuseIPDB and returns the response",
+        "url": "https://api.abuseipdb.com/api/v2/check",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ipAddress",
+              "value": "={{ $fromAI('ip', `ipv4 source address which is to be checked through abuseipdb`, 'string') }}"
+            },
+            {
+              "name": "maxAgeInDays",
+              "value": "90"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Key",
+              "value": "b5a66ef6402c9d36444023c6c58484d7c264364bdc3c56c8b42d86ac44225e818ab09ec48f66eb0f"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        432
+      ],
+      "id": "a9995ef4-83a1-46ec-a033-5dfd73c37c8c",
+      "name": "AbuseIPDB Tool"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to check details about an ip",
+        "url": "=http://ipwho.is/{{ $fromAI('ip', `IP to be searched about`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -288,
+        368
+      ],
+      "id": "cdc5773e-0bf7-4019-b47d-906d7313fb58",
+      "name": "WHOIS Lookup"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{new Date()}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1328,
+        160
+      ],
+      "id": "0d1f7d2c-8f05-4cd1-bd95-55716f1cc4d4",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "topic": "ipfix",
+        "groupId": "n8n-kafka",
+        "options": {
+          "maxInFlightRequests": 1,
+          "fromBeginning": true,
+          "jsonParseMessage": true
+        }
+      },
+      "type": "n8n-nodes-base.kafkaTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        -64
+      ],
+      "id": "b26aa9a9-91de-41a7-aeb0-74c55f728c0e",
+      "name": "Kafka Trigger",
+      "alwaysOutputData": false,
+      "credentials": {
+        "kafka": {
+          "id": "VubascxAxj9Otl7B",
+          "name": "Kafka account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://localhost:5678/mcp-test/c3fe7327-b2c9-4eb4-856b-9b290d1a1eaf",
+        "serverTransport": "httpStreamable",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        368
+      ],
+      "id": "1bc2c7f8-6f88-402c-a865-1be74dfc3d6d",
+      "name": "ElasticSearch MCP Client"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to check if an ip is malicious",
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $fromAI('ip', `ipv4 source address which is to be checked if it is malicious or not`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "611e01005b8b215bb7ab9f655c27fc91c7b30ee3c8d77dba2ce41cfbe77b41fc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        288
+      ],
+      "id": "85a6f5ca-763d-43a8-ba45-b3f846e0f4cf",
+      "name": "VirusTotal Tool1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to AbuseIPDB and returns the response",
+        "url": "https://api.abuseipdb.com/api/v2/check",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ipAddress",
+              "value": "={{ $fromAI('ip', `ipv4 source address which is to be checked through abuseipdb`, 'string') }}"
+            },
+            {
+              "name": "maxAgeInDays",
+              "value": "90"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Key",
+              "value": "b5a66ef6402c9d36444023c6c58484d7c264364bdc3c56c8b42d86ac44225e818ab09ec48f66eb0f"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1648,
+        224
+      ],
+      "id": "1f5572e0-5275-4e1d-8611-3a217f35f7ec",
+      "name": "AbuseIPDB Tool1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to check details about an ip",
+        "url": "=http://ipwho.is/{{ $fromAI('ip', `IP to be searched about`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1776,
+        176
+      ],
+      "id": "fc7a9d86-1770-479f-8239-78084de224ab",
+      "name": "WHOIS Lookup1"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://localhost:5678/mcp-test/c3fe7327-b2c9-4eb4-856b-9b290d1a1eaf",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        320
+      ],
+      "id": "2bf3381d-fcac-4ef3-90cc-db02713a9ff7",
+      "name": "ElasticSearch MCP Client1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "- Generate a detailed report about the attacker, victim, type of possible attack, mitigation steps giving supporting evidence, retrieved logs, confidence scores, past incident reports for the ip etc.\n- Make use of virustotal, whois api, abuse ipdb, supabase RAG and elastic search(to fetch packets 2 mins before and after the given packet) tools for generating the report.\n- Query the Elasticsearch index of stored incoming messages (e.g., ipfix-*) to check if packets with the same source ip have appeared in other logs recently and summarize related events"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -64
+      ],
+      "id": "926f16d2-1211-487b-b1e0-5c7ecd22e658",
+      "name": "Report Generator Agent"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -496,
+        -32
+      ],
+      "id": "c94836da-d09f-4fbb-b404-e1389f9f3444",
+      "name": "Conversational Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert documents": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents in MongoDB": {
+      "ai_tool": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AbuseIPDB Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WHOIS Lookup": {
+      "ai_tool": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kafka Trigger": {
+      "main": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElasticSearch MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AbuseIPDB Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WHOIS Lookup1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Report Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElasticSearch MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Conversational Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Generator Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "73f73b8c-f27f-4395-812c-36072e6fded1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "azbaivAdeXKJKBrO",
+  "tags": []
+}

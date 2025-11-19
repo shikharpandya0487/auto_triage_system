@@ -1,0 +1,5 @@
+/backend/myenv
+/backend/myenv2
+.env
+/backend/.env
+/backend/venv

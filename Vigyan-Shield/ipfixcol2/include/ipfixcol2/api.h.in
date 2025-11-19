@@ -1,0 +1,148 @@
+/**
+ * \file api.h
+ * \author Petr Velan <petr.velan@cesnet.cz>
+ * \author Lukas Hutak <lukas.hutak@cesnet.cz>
+ * \brief Definitions for API functions (header file)
+ * \date 2016-2018
+ */
+
+/* Copyright (C) 2016-2018 CESNET, z.s.p.o.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of the Company nor the names of its contributors
+ *    may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ * ALTERNATIVELY, provided that this notice is retained in full, this
+ * product may be distributed under the terms of the GNU General Public
+ * License (GPL) version 2 or later, in which case the provisions
+ * of the GPL apply INSTEAD OF those given above.
+ *
+ * This software is provided ``as is, and any express or implied
+ * warranties, including, but not limited to, the implied warranties of
+ * merchantability and fitness for a particular purpose are disclaimed.
+ * In no event shall the company or contributors be liable for any
+ * direct, indirect, incidental, special, exemplary, or consequential
+ * damages (including, but not limited to, procurement of substitute
+ * goods or services; loss of use, data, or profits; or business
+ * interruption) however caused and on any theory of liability, whether
+ * in contract, strict liability, or tort (including negligence or
+ * otherwise) arising in any way out of the use of this software, even
+ * if advised of the possibility of such damage.
+ *
+ */
+
+#ifndef IPX_API_H
+#define IPX_API_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * \defgroup ipxAPIDefinition API definitions
+ * \ingroup publicAPIs
+ * \brief Definitions for API functions
+ *
+ * @{
+ */
+
+/**
+ * \def IPX_API
+ * \brief Make an interface public outside
+ *
+ * If the compiler supports attribute to mark objects as hidden, mark all
+ * objects as hidden and export only objects explicitly marked to be part of
+ * the public API.
+ */
+#define IPX_API __attribute__((visibility("default")))
+
+/**
+ * \def IPX_API_VERSION_STR
+ * \brief The application version string (like "1.2.3")
+ */
+#define IPX_API_VERSION_STR "${IPFIXCOL_VERSION}"
+
+/**
+ * \def   IPX_API_MAJOR_VERSION
+ * \brief API major version
+ *
+ * The version MUST be incremented if any backwards incompatible changes are
+ * introduced to the public API. It MAY include minor and patch level changes.
+ * Patch and minor version MUST be reset to 0 when major version is incremented.
+ */
+#define IPX_API_MAJOR_VERSION (${IPFIXCOL_VERSION_MAJOR}U)
+
+/**
+ * \def   IPX_API_MINOR_VERSION
+ * \brief API minor version
+ *
+ * The version MUST be incremented if new, backwards compatible functionality
+ * is introduced to the public API. It MUST be incremented if any public API
+ * functionality is marked as deprecated. Patch version MUST be reset to 0 when
+ * minor version is incremented.
+ */
+#define IPX_API_MINOR_VERSION (${IPFIXCOL_VERSION_MINOR}U)
+
+/**
+ * \def   IPX_API_PATCH_VERSION
+ * \brief API patch version
+ *
+ * The version MUST be incremented if only backwards compatible bug fixes are
+ * introduced. A bug fix is defined as an internal change that fixes incorrect
+ * behavior.
+ */
+#define IPX_API_PATCH_VERSION (${IPFIXCOL_VERSION_PATCH}U)
+
+// Note: Following codes preservers the same numbering as libfds
+/** Status code for success                                               */
+#define IPX_OK             (0)
+/** Status code for the end of a context                                      */
+#define IPX_EOC            (-1)
+/** Status code for ready operation                                       */
+#define IPX_READY          (-11)
+/** Status code for memory allocation error                               */
+#define IPX_ERR_NOMEM      (-2)
+/** Status code for invalid format of data                                */
+#define IPX_ERR_FORMAT     (-3)
+/** Status code for an invalid argument or a combination of arguments     */
+#define IPX_ERR_ARG        (-4)
+/** Status code for not found                                             */
+#define IPX_ERR_NOTFOUND   (-5)
+/** Status code for a truncation of a value                               */
+#define IPX_ERR_TRUNC      (-6)
+/** Status code for insufficient buffer size for a result                 */
+#define IPX_ERR_BUFFER     (-7)
+/** Status code for denied operation                                      */
+#define IPX_ERR_DENIED     (-8)
+/** Status code for modification error                                    */
+#define IPX_ERR_DIFF       (-9)
+/** Status code for end of file/stream                                    */
+#define IPX_ERR_EOF        (-10)
+/** Status code for resource already exists                               */
+#define IPX_ERR_EXISTS     (-12)
+/** Status code for reaching maximum capacity                             */
+#define IPX_ERR_LIMIT      (-13)
+
+/**
+ * \brief Get the default directory with configuration
+ * \return Statically allocated string
+ */
+IPX_API const char *
+ipx_api_cfg_dir();
+
+/**@}*/
+
+#ifdef __cplusplus
+}
+#endif
+#endif	// IPX_API_H
+

@@ -1,0 +1,372 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "229a6bfc-3e01-44c8-b2b2-16e903e5df00",
+      "name": "When chat message received",
+      "webhookId": "4527497a-677f-48c5-8c3d-9fba6e91b176"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json }}",
+        "options": {
+          "systemMessage": "You are a helpful AI assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        -288
+      ],
+      "id": "bfec12a9-159a-441a-97a8-67d1f0998919",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -128
+      ],
+      "id": "48ec24f3-a512-4f27-ba66-c3125e0d7531",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        0
+      ],
+      "id": "dfad7f3a-f786-431b-8aca-d5dc709ab2ad",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "zOPn6Be5pzKjEuSI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=http://ipwho.is/{{ $fromAI('ip', `IP to be searched about`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -128
+      ],
+      "id": "85dc194b-46ee-467f-bf72-3deb97f6cd76",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.elasticsearchTool",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -32
+      ],
+      "id": "860ebc58-eca5-4d04-b83f-8fbc2443f32b",
+      "name": "Get a document in Elasticsearch",
+      "credentials": {
+        "elasticsearchApi": {
+          "id": "C9czeeZWRDiKPqKi",
+          "name": "Elasticsearch account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.kafkaTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        256
+      ],
+      "id": "2136b21e-bc82-4d40-8b80-de57d75536db",
+      "name": "Kafka Trigger"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $fromAI('ip', `ipv4 source address which is to be checked if it is malicious or not`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "611e01005b8b215bb7ab9f655c27fc91c7b30ee3c8d77dba2ce41cfbe77b41fc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1008,
+        -48
+      ],
+      "id": "720f4f5f-29e5-4ce0-ba58-dd50def4f939",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -288
+      ],
+      "id": "71272241-da6e-49bf-a5e9-055905b26801",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/demo-data/top5_netflow.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -288
+      ],
+      "id": "cbc58d42-04ef-4674-beec-9f4c0c8346ac",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -288
+      ],
+      "id": "f5dac421-2773-436e-8b73-8fbd9a8f7d59",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -288
+      ],
+      "id": "2354891f-bc9d-41dd-93a3-3a24e2eaf829",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "topic": "ipfix",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.kafka",
+      "typeVersion": 1,
+      "position": [
+        304,
+        -128
+      ],
+      "id": "0d46337a-d29c-4769-a488-fbc7718b426a",
+      "name": "Kafka",
+      "alwaysOutputData": true,
+      "credentials": {
+        "kafka": {
+          "id": "VubascxAxj9Otl7B",
+          "name": "Kafka account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "topic": "ipfix",
+        "groupId": "n8n-kafka",
+        "options": {
+          "maxInFlightRequests": 1,
+          "fromBeginning": true,
+          "jsonParseMessage": true
+        }
+      },
+      "type": "n8n-nodes-base.kafkaTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        -448
+      ],
+      "id": "8428d4b5-0482-4318-a730-74f7de0fb07e",
+      "name": "Kafka Trigger1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "kafka": {
+          "id": "VubascxAxj9Otl7B",
+          "name": "Kafka account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document in Elasticsearch": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Kafka Trigger1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kafka": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bf5d395f-35ff-43ee-b392-c7d8da862f05",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "IQoSICk5JFRhhk7J",
+  "tags": []
+}

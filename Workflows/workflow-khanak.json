@@ -1,0 +1,902 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "Generate a detailed report about the attacker, victim, type of possible attack, mitigation steps. Make use of virustotal, whois api, and supabase RAG tools for generating the report"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -64
+      ],
+      "id": "bfec12a9-159a-441a-97a8-67d1f0998919",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        224
+      ],
+      "id": "48ec24f3-a512-4f27-ba66-c3125e0d7531",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        224
+      ],
+      "id": "dfad7f3a-f786-431b-8aca-d5dc709ab2ad",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "zOPn6Be5pzKjEuSI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.elasticsearchTool",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        384
+      ],
+      "id": "860ebc58-eca5-4d04-b83f-8fbc2443f32b",
+      "name": "Get a document in Elasticsearch",
+      "credentials": {
+        "elasticsearchApi": {
+          "id": "C9czeeZWRDiKPqKi",
+          "name": "Elasticsearch account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -448
+      ],
+      "id": "71272241-da6e-49bf-a5e9-055905b26801",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/demo-data/top5_netflow.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -448
+      ],
+      "id": "cbc58d42-04ef-4674-beec-9f4c0c8346ac",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -448
+      ],
+      "id": "f5dac421-2773-436e-8b73-8fbd9a8f7d59",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -448
+      ],
+      "id": "2354891f-bc9d-41dd-93a3-3a24e2eaf829",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "topic": "ipfix",
+        "groupId": "n8n-kafka",
+        "options": {
+          "maxInFlightRequests": 1,
+          "fromBeginning": true,
+          "jsonParseMessage": true
+        }
+      },
+      "type": "n8n-nodes-base.kafkaTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "8428d4b5-0482-4318-a730-74f7de0fb07e",
+      "name": "Kafka Trigger1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "kafka": {
+          "id": "VubascxAxj9Otl7B",
+          "name": "Kafka account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook-test/c4d8c10b-bdd1-44a1-a90c-6d9d349426b0",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "output",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        -240
+      ],
+      "id": "e28cfaac-c21e-415d-a397-2a9e9eff1bc0",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "ipfix",
+        "fields": "={{Object.keys($node[\"Edit Fields\"].json).join(',')}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1952,
+        -64
+      ],
+      "id": "5cefbc8b-8b9e-4400-b865-a434023770fb",
+      "name": "Insert documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "14Ija4JNctrnuXFE",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "274c5b8f-6a52-4790-b68e-e788e7f5d7f2",
+      "name": "When chat message received",
+      "webhookId": "858e296e-5085-4c59-b85f-a0bf0ea85bcf"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        -32
+      ],
+      "id": "39079131-0355-4fe7-b72c-d45d07aabfc3",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        176
+      ],
+      "id": "f0d3e213-535c-4977-8795-9ace8b128aa1",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        192
+      ],
+      "id": "15328c5f-c064-43e6-b099-01e557b1898c",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "14Ija4JNctrnuXFE",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf18611a-52b0-4a8f-8a4a-989c09bf86d7",
+              "name": "message",
+              "value": "={{ $('Kafka Trigger1').item.json.message }}",
+              "type": "object"
+            },
+            {
+              "id": "d765509d-2476-40c0-b7e0-a3ba6c77a152",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        -64
+      ],
+      "id": "90684353-e89d-4a41-adf2-5bfb25b3beb0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $fromAI('ip', `ipv4 source address which is to be checked if it is malicious or not`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "611e01005b8b215bb7ab9f655c27fc91c7b30ee3c8d77dba2ce41cfbe77b41fc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        320
+      ],
+      "id": "720f4f5f-29e5-4ce0-ba58-dd50def4f939",
+      "name": "VirusTotal"
+    },
+    {
+      "parameters": {
+        "url": "=http://ipwho.is/{{ $fromAI('ip', `IP to be searched about`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1712,
+        176
+      ],
+      "id": "85dc194b-46ee-467f-bf72-3deb97f6cd76",
+      "name": "Who is"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Find documents in MongoDB about alert packets",
+        "collection": "ipfix",
+        "options": {},
+        "query": "={\n  \"_id\": {{ JSON.stringify($fromAI('id', 'ID of the document to fetch', 'string')) }}\n}"
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        192
+      ],
+      "id": "34fa8b27-3c36-443e-a630-20a314e9b0f2",
+      "name": "Find documents in MongoDB",
+      "credentials": {
+        "mongoDb": {
+          "id": "14Ija4JNctrnuXFE",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "The data consists of Title\tCategory\tAttack Type\tScenario Description\tTools Used\tAttack Steps \tTarget Type\tVulnerability\tMITRE Technique\tImpact\tDetection Method\tSolution\tTags\tSource\t\nUse these details to respond to user query if required, about the attack alert\n",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1888,
+        144
+      ],
+      "id": "24c02ad7-6f14-4d0b-9266-edfa9a802fb1",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "yatIE8LtVG0mHNmy",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        336
+      ],
+      "id": "3c8dcd96-e36f-472e-82d0-7615dca879ef",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "The data consists of Title\tCategory\tAttack Type\tScenario Description\tTools Used\tAttack Steps \tTarget Type\tVulnerability\tMITRE Technique\tImpact\tDetection Method\tSolution\tTags\tSource\t\nUse these details to respond to user query if required, about the attack alert\n",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        192
+      ],
+      "id": "4694a5fa-bee2-4ea2-8f12-cb23832faba0",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "yatIE8LtVG0mHNmy",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        400
+      ],
+      "id": "4f2bbd9a-705f-451f-8238-3785ec2781f9",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MFPSpfAi4yEczJdi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to check if an ip is malicious",
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $fromAI('ip', `ipv4 source address which is to be checked if it is malicious or not`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "611e01005b8b215bb7ab9f655c27fc91c7b30ee3c8d77dba2ce41cfbe77b41fc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        48,
+        352
+      ],
+      "id": "3e550ec2-f1cb-4e92-9acb-fb4037153b7c",
+      "name": "VirusTotal1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to check details about an ip",
+        "url": "=http://ipwho.is/{{ $fromAI('ip', `IP to be searched about`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        176,
+        288
+      ],
+      "id": "44c3f9cc-adc9-4715-bc0e-c5c896928f58",
+      "name": "Who is1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to AbuseIPDB and returns the response",
+        "url": "https://api.abuseipdb.com/api/v2/check",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "ipAddress",
+              "value": "={{ $fromAI('ip', `ipv4 source address which is to be checked through abuseipdb`, 'string') }}"
+            },
+            {
+              "name": "maxAgeInDays",
+              "value": "90"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Key",
+              "value": "b5a66ef6402c9d36444023c6c58484d7c264364bdc3c56c8b42d86ac44225e818ab09ec48f66eb0f"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        256
+      ],
+      "id": "48e534c0-cde1-44cb-a3b1-06a5962c755e",
+      "name": "AbuseIPDB"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $json.message['iana:sourceIPv4Address'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-apikey",
+              "value": "611e01005b8b215bb7ab9f655c27fc91c7b30ee3c8d77dba2ce41cfbe77b41fc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        -48
+      ],
+      "id": "6c0a02fa-2675-4e65-a645-2666c9b63369",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bdd39a36-fc52-4971-9866-952a9e7042ba",
+              "leftValue": "={{ $json.data.attributes.last_analysis_stats.malicious }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        -48
+      ],
+      "id": "9c798efd-a3e7-42c6-a5b4-b5ac519cc171",
+      "name": "If",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36e19416-9f74-4c1e-b043-6802368dbfde",
+              "name": "message",
+              "value": "={{ $('Kafka Trigger1').item.json.message }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        -64
+      ],
+      "id": "5be485f9-7ffd-47d2-9fa7-5ca7a15ae19d",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Get a document in Elasticsearch": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kafka Trigger1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert documents": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Who is": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents in MongoDB": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Who is1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AbuseIPDB": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "35c1c847-f0aa-41c3-a651-0f151c327cc8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "IQoSICk5JFRhhk7J",
+  "tags": []
+}

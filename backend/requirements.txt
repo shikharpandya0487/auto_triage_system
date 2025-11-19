@@ -1,0 +1,11 @@
+langchain_google_genai
+langchain
+langchain_core
+langchain_community
+kafka
+langchain-huggingface 
+pymongo
+supabase==2.4.6
+sentence_transformers
+uvicorn==0.38.0
+fastapi==0.121.0
